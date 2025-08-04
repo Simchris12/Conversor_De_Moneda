@@ -52,14 +52,31 @@ public class Principal {
                 }
 
 
-                System.out.println("Ingrese la cantidad que desea convertir: ");
-                var cantidad = Double.parseDouble(lectura.nextLine());
+                // Solicita al usuario la cantidad a convertir
+                // Se asegura de que la cantidad sea un número válido y mayor que cero
+                double cantidad = 0;
+                while (true) {
+                    System.out.print("Ingrese la cantidad que desea convertir: ");
+                    String entradaCantidad = lectura.nextLine().trim();
+
+                    try {
+                        cantidad = Double.parseDouble(entradaCantidad);
+                        if (cantidad <= 0) {
+                            System.out.println("La cantidad debe ser mayor que cero.");
+                        } else {
+                            break;
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Entrada inválida. Por favor, ingrese un número válido (por ejemplo, 100 o 50.5).");
+                    }
+                }
 
                 Moneda moneda = consulta.conversorDeMoneda(monedaBase, monedaDestino, cantidad);
                 System.out.println("Resultado de la conversión: " + moneda.result());
                 System.out.println("Tasa de conversión: " + moneda.conversion_rate());
                 System.out.println("Cantidad convertida: " + moneda.conversion_result());
                 System.out.println("De: " + moneda.base_code() + " → A: " + moneda.target_code());
+                System.out.println("Fecha de la tasa: " + moneda.time_last_update_utc());
 
 
                 GeneradorDeArchivo generador = new GeneradorDeArchivo();

@@ -49,13 +49,15 @@ public class ConsultaMoneda {
             String resultado = jsonTree.get("result").getAsString();
             double tasa = jsonTree.getAsJsonObject("conversion_rates").get(destino).getAsDouble();
             int conversion = (int) (cantidad * tasa);
+            String fechaActualizacion = jsonTree.get("time_last_update_utc").getAsString();
 
             return new Moneda(
                     resultado,
                     String.valueOf(tasa),
                     conversion,
                     base,
-                    destino
+                    destino,
+                    fechaActualizacion
             );
         } catch (Exception e) {
             throw new RuntimeException("No se pudo obtener la tasa de cambio. " + e.getMessage());
