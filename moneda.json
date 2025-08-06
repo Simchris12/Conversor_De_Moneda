@@ -1,8 +1,8 @@
 {
   "result": "success",
-  "conversion_rate": "60.8677",
-  "conversion_result": 60,
+  "conversion_rate": "5.5046",
+  "conversion_result": 192,
   "base_code": "USD",
-  "target_code": "DOP",
-  "time_last_update_utc": "Mon, 04 Aug 2025 00:00:02 +0000"
+  "target_code": "BRL",
+  "time_last_update_utc": "Wed, 06 Aug 2025 00:00:01 +0000"
 }

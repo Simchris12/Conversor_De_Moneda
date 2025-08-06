@@ -1,62 +1,93 @@
 import java.io.IOException;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Principal {
 
-    // Metodo para mostrar una opción de ayuda al usuario
-    //en caso de que el usuario ingrese una moneda inválida.
-    //Se le pregunta al usuario si desea ver las monedas disponibles.
-    private static void mostrarOpcionAyuda(Set<String> monedasDisponibles, Scanner lectura) {
-        System.out.print("¿Deseas ver las monedas disponibles? (S/N): ");
-        String respuesta = lectura.nextLine().trim().toUpperCase();
-        if (respuesta.equals("S")) {
-            System.out.println("\n--- Monedas válidas ---");
-            monedasDisponibles.stream().sorted().forEach(codigo -> System.out.println("• " + codigo));
-            System.out.println("------------------------");
-        }
-    }
+    private static final Set<String> MONEDAS_PERMITIDAS = Set.of("ARS", "BOB", "BRL", "CLP", "COP", "USD");
 
-    // Metodo principal que inicia la aplicación
     public static void main(String[] args) {
         Scanner lectura = new Scanner(System.in);
         ConsultaMoneda consulta = new ConsultaMoneda();
-        Set<String> monedasDisponibles = consulta.obtenerMonedasDisponibles();
-        System.out.println("******************************************");
-        System.out.println("Bienvenido a la aplicación de consulta de monedas");
 
-        //Entra el Loop
+        // Filtrar solo las monedas permitidas
+        Set<String> monedasDisponibles = consulta.obtenerMonedasDisponibles()
+                .stream()
+                .filter(MONEDAS_PERMITIDAS::contains)
+                .collect(Collectors.toSet());
+
         boolean continuar = true;
 
         while (continuar) {
             try {
-                // Solicita al usuario los códigos de las monedas y la cantidad a convertir
+                // Mostrar menú
+                System.out.println("""
+                        ******************************************************
+                        Bienvenido/a al Conversor de Moneda:
+                        ------------------------------------------------------
+                        1) Dólar           => Peso argentino
+                        2) Peso argentino  => Dólar
+                        3) Dólar           => Real brasileño
+                        4) Real brasileño  => Dólar
+                        5) Dólar           => Peso colombiano
+                        6) Peso colombiano => Dólar
+                        7) Salir
+                        ------------------------------------------------------
+                        Elija una opción válida (1-7):
+                        ******************************************************
+                        """);
+
+                String opcion = lectura.nextLine().trim();
                 String monedaBase = "";
-                while (true) {
-                    System.out.print("Ingrese el código de la moneda base (por ejemplo, USD): ");
-                    monedaBase = lectura.nextLine().trim().toUpperCase();
-                    if (monedasDisponibles.contains(monedaBase)) break;
-
-                    System.out.println("Moneda base inválida.");
-                    mostrarOpcionAyuda(monedasDisponibles, lectura);
-                }
-
                 String monedaDestino = "";
-                while (true) {
-                    System.out.print("Ingrese el código de la moneda destino (por ejemplo, EUR): ");
-                    monedaDestino = lectura.nextLine().trim().toUpperCase();
-                    if (monedasDisponibles.contains(monedaDestino)) break;
 
-                    System.out.println("Moneda destino inválida.");
-                    mostrarOpcionAyuda(monedasDisponibles, lectura);
+                switch (opcion) {
+                    case "1" -> {
+                        monedaBase = "USD";
+                        monedaDestino = "ARS";
+                    }
+                    case "2" -> {
+                        monedaBase = "ARS";
+                        monedaDestino = "USD";
+                    }
+                    case "3" -> {
+                        monedaBase = "USD";
+                        monedaDestino = "BRL";
+                    }
+                    case "4" -> {
+                        monedaBase = "BRL";
+                        monedaDestino = "USD";
+                    }
+                    case "5" -> {
+                        monedaBase = "USD";
+                        monedaDestino = "COP";
+                    }
+                    case "6" -> {
+                        monedaBase = "COP";
+                        monedaDestino = "USD";
+                    }
+                    case "7" -> {
+                        System.out.println("Gracias por usar la aplicación. ¡Hasta pronto!");
+                        System.out.println("******************************************");
+                        break;
+                    }
+                    default -> {
+                        System.out.println("Opción inválida. Intenta de nuevo.");
+                        continue;
+                    }
                 }
 
+                if (opcion.equals("7")) {
+                    continuar = false;
+                    lectura.close();
+                    break;
+                }
 
-                // Solicita al usuario la cantidad a convertir
-                // Se asegura de que la cantidad sea un número válido y mayor que cero
+                // Solicitar cantidad a convertir
                 double cantidad = 0;
                 while (true) {
-                    System.out.print("Ingrese la cantidad que desea convertir: ");
+                    System.out.printf("Ingrese la cantidad que desea convertir de %s a %s: ", monedaBase, monedaDestino);
                     String entradaCantidad = lectura.nextLine().trim();
 
                     try {
@@ -71,6 +102,7 @@ public class Principal {
                     }
                 }
 
+                // Realizar conversión
                 Moneda moneda = consulta.conversorDeMoneda(monedaBase, monedaDestino, cantidad);
                 System.out.println("Resultado de la conversión: " + moneda.result());
                 System.out.println("Tasa de conversión: " + moneda.conversion_rate());
@@ -78,17 +110,17 @@ public class Principal {
                 System.out.println("De: " + moneda.base_code() + " → A: " + moneda.target_code());
                 System.out.println("Fecha de la tasa: " + moneda.time_last_update_utc());
 
-
+                // Guardar archivo
                 GeneradorDeArchivo generador = new GeneradorDeArchivo();
                 generador.guardarJson(moneda);
 
-
+                // Preguntar si desea realizar otra conversión
                 String respuesta;
                 while (true) {
                     System.out.print("\n¿Deseas realizar otra conversión? (S/N): ");
                     respuesta = lectura.nextLine().trim().toUpperCase();
                     if (respuesta.equals("S")) {
-                        break; // vuelve al inicio del while principal
+                        break;
                     } else if (respuesta.equals("N")) {
                         continuar = false;
                         System.out.println("Gracias por usar la aplicación. ¡Hasta pronto!");
@@ -99,6 +131,7 @@ public class Principal {
                         System.out.println("Respuesta inválida. Por favor, escribe 'S' para sí o 'N' para no.");
                     }
                 }
+
             } catch (RuntimeException | IOException e) {
                 System.out.println("Error: " + e.getMessage());
                 String respuesta;
