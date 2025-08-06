@@ -41,11 +41,3 @@
   <li>Gson para parsear JSON 📦</li>
 </ul>
 
-<h2>📷 Vista del menú</h2>
-
-<p align="center">
-  <img src="menu-conversor-de-moneda.jpg" width="600" alt="Captura de menú"/>
-</p>
-
-<h2>📦 Estructura del proyecto</h2>
-
