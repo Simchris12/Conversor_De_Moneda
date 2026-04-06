@@ -1,7 +1,7 @@
 <h1 align="center">💱 Conversor de Monedas en Java</h1>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Java-17-blue?style=for-the-badge&logo=java" alt="Java Badge"/>
+  <img src="https://img.shields.io/badge/Java-21-blue?style=for-the-badge&logo=java" alt="Java Badge"/>
   <img src="https://img.shields.io/badge/API-ExchangeRateHost-green?style=for-the-badge" alt="API Badge"/>
 </p>
 
